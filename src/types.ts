@@ -1,3 +1,3 @@
-import type { CommandInteraction } from 'discord.js';
+import type { ChatInputCommandInteraction } from 'discord.js';
 
-export type CommandHandler = (interaction: CommandInteraction) => void | Promise<void>;
+export type CommandHandler = (interaction: ChatInputCommandInteraction) => void | Promise<void>;
