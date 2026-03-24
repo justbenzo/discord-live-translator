@@ -87,6 +87,8 @@ export const joinCommandHandler: CommandHandler = async (interaction) => {
 
       await interaction.editReply('Successfully connected to your voice channel! :hugging:');
 
+      const client = interaction.client;
+
       connection.receiver.speaking.on('start', async (userId) => {
         if (!connection) return;
 
@@ -104,7 +106,31 @@ export const joinCommandHandler: CommandHandler = async (interaction) => {
             ? originalText
             : await translate(originalText, languages[userSettings.target].translatorCode);
 
-        await readText(connection, translatedText, userSettings.target);
+        const mode = userSettings.mode || 'voice';
+
+        // Voice mode: play TTS audio as before
+        if (mode === 'voice' || mode === 'both') {
+          await readText(connection, translatedText, userSettings.target);
+        }
+
+        // Captions mode: DM the translated text to the user
+        if (mode === 'captions' || mode === 'both') {
+          try {
+            const user = await client.users.fetch(userId);
+            const speakerName = user.displayName || user.username;
+            await user.send({
+              embeds: [
+                {
+                  color: 0x5865f2,
+                  description: `**${speakerName}:** ${translatedText}`,
+                  footer: originalText !== translatedText ? { text: `Original: ${originalText}` } : undefined
+                }
+              ]
+            });
+          } catch (dmError) {
+            console.error(`Failed to DM captions to user ${userId}:`, dmError);
+          }
+        }
       });
     });
   } catch (err) {

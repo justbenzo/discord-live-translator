@@ -1,4 +1,4 @@
-FROM node:20-slim
+FROM node:20-bookworm-slim
 
 # Prepare pnpm
 ENV PNPM_HOME="/pnpm"
@@ -24,7 +24,7 @@ RUN curl https://sh.rustup.rs -sSf | bash -s -- -y
 ENV PATH="/root/.cargo/bin:$PATH"
 
 # Add Python
-COPY --from=python:3.11-slim /usr/local /usr/local
+COPY --from=python:3.11-slim-bookworm /usr/local /usr/local
 
 # Set directory
 WORKDIR /app

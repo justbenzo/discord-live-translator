@@ -17,7 +17,7 @@ const env = createEnv({
     REDIS_URL: z.string().optional(),
     STT_HOST: z.string(),
     TRANSLATION_HOST: z.string(),
-    HEARTBEAT_URL: z.string().url()
+    HEARTBEAT_URL: z.string().url().optional()
   },
   runtimeEnv: process.env
 });

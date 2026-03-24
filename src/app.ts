@@ -76,11 +76,12 @@ if (env.CLIENT_ID && env.GUILD_ID) {
 }
 
 if (env.HEARTBEAT_URL) {
+  const heartbeatUrl = env.HEARTBEAT_URL;
   setInterval(async () => {
     if (client.isReady()) {
-      console.log(`Sending heartbeat to ${env.HEARTBEAT_URL}...`);
+      console.log(`Sending heartbeat to ${heartbeatUrl}...`);
       try {
-        const res = await fetch(env.HEARTBEAT_URL, {
+        const res = await fetch(heartbeatUrl, {
           method: 'POST'
         });
         if (!res.ok) {
