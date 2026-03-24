@@ -37,8 +37,8 @@ COPY src/lib/tts/preload_models.py src/lib/tts/
 RUN python3 src/lib/tts/preload_models.py
 
 # Install Node.js dependencies
-COPY package.json pnpm-lock.yaml .
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile --ignore-scripts
+COPY package.json .
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --no-frozen-lockfile --ignore-scripts
 
 # Copy application files
 COPY . .
