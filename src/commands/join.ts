@@ -101,9 +101,20 @@ export const joinCommandHandler: CommandHandler = async (interaction) => {
 
     connection.on('stateChange', (oldState, newState) => {
       console.log('[VOICE DEBUG] state:', oldState.status, '->', newState.status);
+      if (newState.status === 'connecting') {
+        console.log('[VOICE DEBUG] networking:', newState.networking?.state?.code);
+      }
     });
 
-    await entersState(connection, VoiceConnectionStatus.Ready, 20e3);
+    connection.on('debug', (message) => {
+      console.log('[VOICE DETAIL]', message);
+    });
+
+    connection.on('error', (error) => {
+      console.log('[VOICE ERROR]', error.message);
+    });
+
+    await entersState(connection, VoiceConnectionStatus.Ready, 30e3);
 
     const player = audioQueue.init(connection);
     player.play(createAudioResource(path.join(__dirname, '../../audio/connect.mp3')));
