@@ -5,10 +5,11 @@ services:
     build: .
     restart: always
     env_file: .env
+    network_mode: host
     environment:
-      - REDIS_URL=redis://redis:6379
-      - STT_HOST=http://stt:8000
-      - TRANSLATION_HOST=http://libretranslate:5000
+      - REDIS_URL=redis://127.0.0.1:6379
+      - STT_HOST=http://127.0.0.1:8000
+      - TRANSLATION_HOST=http://127.0.0.1:5000
     depends_on:
       - stt
       - libretranslate
