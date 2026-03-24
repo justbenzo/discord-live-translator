@@ -59,13 +59,37 @@ export const joinCommandHandler: CommandHandler = async (interaction) => {
     let connection = getVoiceConnection(interaction.guild.id);
     if (!connection) {
       isNewConnection = true;
+
+      // Debug: wrap adapter to trace voice events
+      const origAdapter = channel.guild.voiceAdapterCreator;
+      const debugAdapter: typeof origAdapter = (methods) => {
+        const wrapped = origAdapter({
+          onVoiceServerUpdate: (data) => {
+            console.log('[VOICE DEBUG] onVoiceServerUpdate received');
+            methods.onVoiceServerUpdate(data);
+          },
+          onVoiceStateUpdate: (data) => {
+            console.log('[VOICE DEBUG] onVoiceStateUpdate received');
+            methods.onVoiceStateUpdate(data);
+          },
+          destroy: () => methods.destroy()
+        });
+        const origSend = wrapped.sendPayload.bind(wrapped);
+        wrapped.sendPayload = (payload: any) => {
+          const result = origSend(payload);
+          console.log('[VOICE DEBUG] sendPayload op:', payload.op, 'returned:', result);
+          return result;
+        };
+        return wrapped;
+      };
+
       connection = joinVoiceChannel({
         channelId: channel.id,
         guildId: channel.guild.id,
         selfDeaf: false,
         selfMute: false,
         // @ts-ignore
-        adapterCreator: channel.guild.voiceAdapterCreator
+        adapterCreator: debugAdapter
       });
     } else {
       connection.rejoin({
@@ -74,6 +98,10 @@ export const joinCommandHandler: CommandHandler = async (interaction) => {
         selfMute: false
       });
     }
+
+    connection.on('stateChange', (oldState, newState) => {
+      console.log('[VOICE DEBUG] state:', oldState.status, '->', newState.status);
+    });
 
     await entersState(connection, VoiceConnectionStatus.Ready, 20e3);
 
